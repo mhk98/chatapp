@@ -12,7 +12,7 @@ const Join = () => {
           <div className="join-form">
                 <input placeholder="name" onChange={(e) => setName(e.target.value)}/>
                 <input placeholder="room" onChange={(e) => setRoom(e.target.value)}/>
-                <Link to={`/chat?name=${name} & room=${room}`}>Join</Link>
+                <Link to={`/chat?name=${name}&room=${room}`}>Join</Link>
             </div>
 
         </div>
