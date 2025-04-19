@@ -32,7 +32,22 @@ return users.splice(index, 1)[0];
 };
 
 
+const getUserId = (id) => {
+const user = users.find(user => user.id === id);
+
+return user;
+
+};
+
+const getRoomUsers = (room) => {
+    const roomUsers = users.filter((user) => user.room === room);
+    return roomUsers;
+}
+
+
 module.exports = {
     addUser,
-    removeUser
+    removeUser,
+    getUserId,
+    getRoomUsers
 }

@@ -2,7 +2,7 @@ const express = require('express');
 const http = require("http");
 const socketIO = require("socket.io");
 const cors = require("cors");
-const { addUser, removeUser } = require('./users');
+const { addUser, removeUser, getUserId, getRoomUsers } = require('./users');
 const port = 5000;
 const app = express();
 
@@ -40,12 +40,50 @@ socket.on("join", ({name, room}, callback) => {
   if(error){
     callback(error);
   }
+
+  socket.join(room);
+  socket.emit("message", {
+    user:"System",
+    text:`Welcome ${name} to ${room}`,
+  });
+
+  socket.broadcast.to(room).emit("message", {
+    user:"System",
+    text:`${name} just joined ${room}`,
+  });
+
+  const roomUsers = getRoomUsers(room)
+  io.to(room).emit("userList", {roomUsers});
+
   callback();
 });
 
+socket.on("message", (message) => {
+  console.log("message: ", message)
+  const user = getUserId(socket.id)
+
+  io.to(user.room).emit("message", {
+    user: user.name,
+    text: message,
+  });
+  
+})
+
   socket.on("disconnect", () => {
     console.log("user disconnected", socket.id)
-    removeUser(socket.id)
+    const user = removeUser(socket.id)
+    // removeUser(socket.id)
+
+   if(user) {
+    io.to(user.room).emit("message", {
+      user:"System",
+      text:`${user.name} just left ${user.room}`,
+    });
+
+    const roomUsers = getRoomUsers(user.room)
+  io.to(user.room).emit("userList", {roomUsers});
+   }
+
   })
 });
 
